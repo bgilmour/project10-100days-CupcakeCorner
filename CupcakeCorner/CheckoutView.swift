@@ -10,8 +10,9 @@ import SwiftUI
 struct CheckoutView: View {
     @ObservedObject var order: Order
 
+    @State private var showingAlert = false
     @State private var confirmationMessage = ""
-    @State private var showingConfirmation = false
+    @State private var errorMessage = ""
 
     var body: some View {
         GeometryReader { geo in
@@ -33,8 +34,12 @@ struct CheckoutView: View {
             }
         }
         .navigationBarTitle("Check out", displayMode: .inline)
-        .alert(isPresented: $showingConfirmation) {
-            Alert(title: Text("Thank you!"), message: Text(confirmationMessage), dismissButton: .default(Text("OK")))
+        .alert(isPresented: $showingAlert) {
+            if !confirmationMessage.isEmpty {
+                return Alert(title: Text("Thank you!"), message: Text(confirmationMessage), dismissButton: .default(Text("OK")))
+            } else {
+                return Alert(title: Text("Network error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
+            }
         }
     }
 
@@ -53,16 +58,23 @@ struct CheckoutView: View {
         print("Sending: \(String(data: encoded, encoding: .utf8)!)")
 
         URLSession.shared.dataTask(with: request) { data, response, error in
+            confirmationMessage = ""
+            errorMessage = ""
             guard let data = data else {
                 print("No data in response: \(error?.localizedDescription ?? "Unknown error").")
+                errorMessage = "\(error?.localizedDescription ?? "Unknown error")"
+                showingAlert = true
                 return
             }
 
             if let decodedOrder = try? JSONDecoder().decode(Order.self, from: data) {
+                print("Response body: \(String(data: data, encoding: .utf8)!)")
                 confirmationMessage = "Your order for \(decodedOrder.quantity)x \(Order.types[decodedOrder.type].lowercased()) cupcakes is on its way!"
-                showingConfirmation = true
+                showingAlert = true
             } else {
                 print("Invalid response from server: \(String(data: data, encoding: .utf8)!)")
+                errorMessage = "Invalid response from server"
+                showingAlert = true
             }
         }
         .resume()
