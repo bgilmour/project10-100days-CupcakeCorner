@@ -73,7 +73,7 @@ class Order: ObservableObject, Codable {
         extraFrosting = try container.decode(Bool.self, forKey: .extraFrosting)
         addSprinkles = try container.decode(Bool.self, forKey: .addSprinkles)
 
-        name = try container.decode(String.self, forKey: .type)
+        name = try container.decode(String.self, forKey: .name)
         streetAddress = try container.decode(String.self, forKey: .streetAddress)
         city = try container.decode(String.self, forKey: .city)
         zip = try container.decode(String.self, forKey: .zip)
