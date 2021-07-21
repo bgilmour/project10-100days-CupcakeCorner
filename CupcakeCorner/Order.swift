@@ -35,4 +35,24 @@ class Order: ObservableObject {
         }
         return true
     }
+
+    var cost: Double {
+        // base cost is $2 per cake
+        var cost = Double(quantity) * 2
+
+        // add on a premium for more comples cake types
+        cost += Double(type) / 2
+
+        // add $1/cake for extra frosting
+        if extraFrosting {
+            cost += Double(quantity)
+        }
+
+        // add 50c/cake for sprinkles
+        if addSprinkles {
+            cost += Double(quantity)  / 2
+        }
+
+        return cost
+    }
 }
