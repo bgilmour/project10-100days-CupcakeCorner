@@ -44,7 +44,7 @@ struct CheckoutView: View {
     }
 
     func placeOrder() {
-        guard let encoded = try? JSONEncoder().encode(order) else {
+        guard let encoded = try? JSONEncoder().encode(order.details) else {
             print("Failed to encode order")
             return
         }
@@ -67,9 +67,9 @@ struct CheckoutView: View {
                 return
             }
 
-            if let decodedOrder = try? JSONDecoder().decode(Order.self, from: data) {
+            if let orderDetails = try? JSONDecoder().decode(OrderDetails.self, from: data) {
                 print("Response body: \(String(data: data, encoding: .utf8)!)")
-                confirmationMessage = "Your order for \(decodedOrder.quantity)x \(Order.types[decodedOrder.type].lowercased()) cupcakes is on its way!"
+                confirmationMessage = "Your order for \(orderDetails.quantity)x \(Order.types[orderDetails.type].lowercased()) cupcakes is on its way!"
                 showingAlert = true
             } else {
                 print("Invalid response from server: \(String(data: data, encoding: .utf8)!)")
